@@ -1,0 +1,4 @@
+  <label id="bgi" text="BGI SOAP Package Beta"/>
+  <section name="NGS: Mapping" id="bgi_supporting">
+        <tool file="contiguator/contiguator.xml"/>
+  </section>

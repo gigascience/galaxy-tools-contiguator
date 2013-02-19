@@ -1,0 +1,211 @@
+<tool id="CONTIGuator" name="Align contigs and scaffolds" version="0.1">
+    <description>using CONTIGuator 2</description>
+    <command interpreter="python">
+        contiguator.py
+
+        ##Inputs
+        --ref_fasta=$ref_fasta ##Input reference genome in fasta format
+        --contig_scaff_fasta=$contig_scaff_fasta ##Input contig or scaffold sequences in fasta format
+
+        ## Check if using default or custom parameters
+        --default_full_settings_type=$default_full_settings.settings_type
+        #if $default_full_settings.settings_type == "full"
+          --more_results=$default_full_settings.more_results
+          --log_level=$default_full_settings.log_level
+          ##Blast parameters
+          --blast_evalue_threshold=$default_full_settings.blast_evalue_threshold
+          ##Parse blast mode
+          ##Not sure what these parameters do
+          ##--parse_ready_made_blast_output=$default_full_settings.parse_ready_made_blast_output
+          ##--blast_output_for_parsing=$default_full_settings.blast_output_for_parsing
+          ##Contig profiling parameters
+          --contig_minimal_length=$default_full_settings.contig_minimal_length
+          --contig_minimal_coverage=$default_full_settings.contig_minimal_coverage
+          --minimal_blast_hit_length=$default_full_settings.minimal_blast_hit_length
+          --minimum_best_replicon_estimation_ratio=$default_full_settings.minimum_best_replicon_estimation_ratio
+          ##Primer picking
+          ##--do_primer_picking=$default_full_settings.do_primer_picking
+          ##The next 2 params is commented out because of lack of documentation
+          ##--use_default_params=$default_full_settings.use_default_params
+          ##--compute_inner_primers=$default_full_settings.compute_inner_primers
+        #end if
+
+        ##Output
+        --html_file=$html_file
+        --html_file_files_path=$html_file.files_path
+
+    </command>
+    <requirements>
+        <requirement type="package">contiguator</requirement>
+    </requirements>
+    <inputs>
+        <param name="ref_fasta"
+               type="data"
+               format="fasta"
+               label="Reference genome file in FASTA format"/>
+        <param name="contig_scaff_fasta"
+               type="data"
+               format="fasta"
+               label="Contig or scaffold file in FASTA format"/>
+        <conditional name="default_full_settings">
+            <param name="settings_type"
+                   type="select"
+                   label="Contiguator settings to use"
+                   help="Default settings are suitable for most analyses. If you want full control, use Full parameter list">
+                <option value="default">Default</option>
+                <option value="full">Full parameter list</option>
+            </param>
+            <when value="default"/>
+            <when value="full">
+                <param name="more_results"
+                       type="select"
+                       value="no"
+                       label="Output extra information?">
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </param>
+                <param name="log_level"
+                       type="select"
+                       value="debug"
+                       label="Logging level">
+                    <option value="debug">Debug</option>
+                    <option value="development">Development</option>
+                    <option value="verbose">Verbose</option>
+                </param>
+                <param name="blast_evalue_threshold"
+                       type="text"
+                       value="1e-20"
+                       label="e-value threshold"/>
+                <param name="contig_minimal_length"
+                       type="integer"
+                       value="1000"
+                       label="Minimum length of contigs for analysis"/>
+                <param name="contig_minimal_coverage"
+                       type="integer"
+                       value="20"
+                       label="Minimum percentage of contig coverage for analysis"/>
+                <param name="minimal_blast_hit_length"
+                       type="integer"
+                       value="1100"
+                       label="Minimum length of a Blast hit"/>
+                <param name="minimum_best_replicon_estimation_ratio"
+                       type="integer"
+                       value="20"
+                       label="Minimum ratio for a best replicon estimation"/>
+                <!--<param name="do_primer_picking"-->
+                       <!--type="select"-->
+                       <!--value="no"-->
+                       <!--label="Select primers?">-->
+                    <!--<option value="no">No</option>-->
+                    <!--<option value="yes">Yes</option>-->
+                <!--</param>-->
+            </when>
+        </conditional>
+    </inputs>
+    <outputs>
+    <data name="html_file"
+          format="html"
+          label="contiguator.alignment"/>
+    </outputs>
+    <!--<tests>--><!--<test>--><!----><!--</test>--><!--</tests>-->
+    <help>
+**What it does**
+
+`CONTIGuator &lt;http://contiguator.sourceforge.net&gt;`_
+is a Python script which can be used in the bacterial genome
+finishing process. It can be used to align and resolve the relative position of
+the contigs obtained with the latest sequencing technologies, and enable a set
+of PCR primers to be designed to fill in gaps towards finishing the assembly of
+genome. It also can be used to study the genome structure using the Artemis
+comparison tool (ACT).
+
+CONTIGuator uses the megaBlast algorithm to create a so­called “contig profile”,
+where each contig and the regions of the reference genomes are divided into
+regions of high similarity. This results in an higher number of PCR primers,
+generated by a run of ABACAS using primer3 and Mummer.
+
+The outputs of the program can be visualized with the ACT, where the user can
+obtain a clear insight into the structural genomic features of the draft genome
+(a result of the contig profiling step) and visualize the position and length
+of the putative PCR products. A publication­quality pdf map will be produced for
+each putative replicon.
+
+-----
+
+**How to use the tool**
+
+All input sequences need to be in FASTA format.
+
+-----
+
+**Output**
+
+The outputs of CONTIGuator are various files and they are divided by folders
+“Map” folders.
+
+According to the number of input reference sequence replicons, there will be the
+same number of directories whose name starts with “Map”, followed by the ID of
+the reference replicon. Inside each directory is a series of files that can be
+used as input for ACT::
+
+  Reference.embl        Pseudo­contig ACT file
+  PseudoContig.fsa      Pseudo­contig fasta file
+  PseudoContig.crunch   ACT comparison file
+  PseudoContig.embl     Pseudo­contig ACT file
+  MappedContigs.txt     Names and lengths of contigs mapped to the particular
+                        reference molecule
+
+In addition, a PDF file containing the "manual" version of the map viewable with
+ACT is created.
+
+In the full parameter list, Contiguator can be configured to output more
+information for each alignment between contig and reference sequences::
+
+  AlignDetails.tab              Tab delimited file containing details about
+                                mapped hits
+  AlignedContigsHits.fsa        Fasta file containing mapped hits on contigs
+  AlignedReferenceHits.fsa      Fasta file containing mapped hits on reference
+  UnAlignedContigsHits.fsa      Fasta file containing unmapped regions on
+                                contigs
+  UnAlignedReferenceHits.fsa    Fasta file containing unmapped regions on
+                                reference.
+                                If the primer picking option was selected (­P),
+                                the folder will contain other files
+  PCRPrimers.tsv                Table containing details about the PCR primers
+                                generated “UnMappedContigs” folder
+
+The UnMapped Contigs folder contains information about contigs that CONTIGuator
+was unable to map in fasta format::
+
+  Excluded.fsa                  All excluded contigs
+  Multi.fsa                     Contigs mapped to more than one replicon
+  Short.fsa                     Contigs below the length threshold
+  NoCoverage.fsa                Contigs below the coverage threshold
+  CoverageBorderLine.fsa        Contigs near the coverage threshold
+  Discarded.fsa                 Contigs discarded due to duplicated hits
+  UnMappedContigsHits.tab       Contains the list of the excluded contigs with
+                                the number of tblastn hits
+  UnMappedReferenceRegions.tab  Contains the reference genome unmapped regions
+                                with at least one tblastn hit
+  UnMappedContigs.txt           Names and lengths of the contigs not mapped to
+                                any particular reference molecule
+
+In addition to these files, a log file called CONTIGuator.log is present in
+the source directory. The amount of log output can be modulated within the full
+parameters settings.
+
+The primer picking functionality has not been included in this wrapping of
+Contiguator.
+
+-----
+
+Please cite the following reference if you use this tool::
+
+  CONTIGuator:a bacterial genomes finishing tool for structural insights on
+  draft genomes. Marco Galardini, Emanuele G Biondi, Marco Bazzicalupo and
+  Alessio Mengoni. Source Code for Biology and Medicine 2011, 6:11
+  doi:10.1186/1751-0473-6-11
+    </help>
+</tool>
+
+
