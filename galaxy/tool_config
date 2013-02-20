@@ -1,4 +1,4 @@
-  <label id="bgi" text="BGI SOAP Package Beta"/>
-  <section name="NGS: Mapping" id="bgi_supporting">
-        <tool file="contiguator/contiguator.xml"/>
+  <label id="ngs_eval" text="NGS Evaluation Tools"/>
+  <section id="ngs_eval_visual" name="NGS: Visualisation">
+    <tool file="contiguator/contiguator.xml"/>
   </section>
