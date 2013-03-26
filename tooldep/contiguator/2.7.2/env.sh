@@ -3,11 +3,11 @@
 #Configure home directory for Contiguator
 CONTIGUATOR_HOME=/usr/local/contiguator/current
 
-#Configure PATH for Blast
 BLAST_HOME=/usr/local/blast/current
+MUMMER_HOME=/usr/local/mummer/current
 
-PATH="$BLAST_HOME/bin:$PATH"
+PATH=$PATH:$BLAST_HOME/bin:$MUMMER_HOME/bin
 
-export CONTIGUATOR_HOME BLAST_HOME PATH
+export MUMMER_HOME CONTIGUATOR_HOME BLAST_HOME PATH
 
 
