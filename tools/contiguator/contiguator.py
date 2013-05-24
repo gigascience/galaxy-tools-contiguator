@@ -57,27 +57,21 @@ def __main__():
     #Create directory to process and store contiguator outputs
     html_file = opts.html_file
     job_work_dir = opts.html_file_files_path
-#    if not os.path.exists(job_work_dir):
-#        print "HTML directory does not exist"
-#        try:
-#            print "Creating directory"
-#            #This actually creates a dir in:
-#            #./galaxy-central/database/files/000/dataset_139_files
-#            #./galaxy-central/database/job_working_directory/000/126/dataset_139_files/Map_gi.225631039.ref.NC.012417.1.
-#            os.makedirs(job_work_dir)
-#        except:
-#            pass
+
+    #Check
+    #print "html file: ", html_file
+    #print "job_work_dir: ", job_work_dir
 
     dirpath = tempfile.mkdtemp(prefix='tmp-contiguator-')
 
     #Run contiguator
-    #Need to give the proper place to where Galaxy stored files
-    #Not        ./galaxy-central/database/job_working_directory/000/131/dataset_144_files/
-    #Instead    ./galaxy-central/database/files/000/dataset_144_files/
-    #So need to replace "job_working_directory/000/131" in between database/ and and /dataset_
-    #With "files/000"
     rex = re.compile('database/(.*)/dataset_')
-    files_dir = rex.sub("database/files/000/dataset_", job_work_dir)
+    #Create replacement text using html_file
+    #Split string into tokens
+    tokens = html_file.split("/")
+    #Get second to last token
+    userId = tokens[len(tokens) - 2]
+    files_dir = rex.sub("database/files/" + userId + "/dataset_", job_work_dir)
     files_dir = files_dir + "/"
     #print "New html dir: ", files_dir
     #Create directory
