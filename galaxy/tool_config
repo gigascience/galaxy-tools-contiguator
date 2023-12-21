@@ -1,4 +1,0 @@
-  <label id="ngs_eval" text="NGS Evaluation Tools"/>
-  <section id="ngs_eval_visual" name="NGS: Visualisation">
-    <tool file="contiguator/contiguator.xml"/>
-  </section>
